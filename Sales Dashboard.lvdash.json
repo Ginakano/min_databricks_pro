@@ -1,0 +1,205 @@
+{
+  "datasets": [
+    {
+      "name": "a5ed97a8",
+      "displayName": "dim_products",
+      "config": {
+        "version": "1.1",
+        "source": "workspace.salesdb.dim_products",
+        "dimensions": [
+          {
+            "expr": "source.*"
+          }
+        ],
+        "measures": [
+          {
+            "name": "count",
+            "expr": "COUNT(*)",
+            "comment": "Represents the total number of rows in the dataset. Use this measure to count all",
+            "displayName": "Count"
+          }
+        ]
+      }
+    },
+    {
+      "name": "f922c8b0",
+      "displayName": "fact_sales",
+      "config": {
+        "version": "1.1",
+        "source": "workspace.salesdb.fact_sales",
+        "dimensions": [
+          {
+            "expr": "source.*"
+          }
+        ],
+        "measures": [
+          {
+            "name": "count",
+            "expr": "COUNT(*)",
+            "comment": "Represents the total number of rows in the dataset. Use this measure to count all",
+            "displayName": "Count"
+          }
+        ]
+      }
+    },
+    {
+      "name": "3df417a9",
+      "displayName": "Sales Orders and Customer Details Overview Dataset",
+      "queryLines": [
+        "SELECT \r\n",
+        "f.order_date,\r\n",
+        "f.order_number,\r\n",
+        "f.sales_amount,\r\n",
+        "f.quantity,\r\n",
+        "f.price,\r\n",
+        "p.product_key,\r\n",
+        "p.product_name,\r\n",
+        "p.category,\r\n",
+        "c.customer_number,\r\n",
+        "concat (c.first_name, ' ', c.last_name) AS customer_name,\r\n",
+        "c.birthdate\r\n",
+        "FROM workspace.salesdb.fact_sales f\r\n",
+        "LEFT JOIN workspace.salesdb.dim_products p\r\n",
+        "ON f.product_key = P.product_key\r\n",
+        "LEFT JOIN workspace.salesdb.dim_customers c\r\n",
+        "ON f.customer_key = c.customer_key\r\n"
+      ],
+      "catalog": "workspace",
+      "schema": "salesdb"
+    }
+  ],
+  "pages": [
+    {
+      "name": "3dcaf57a",
+      "displayName": "Untitled page",
+      "layout": [
+        {
+          "widget": {
+            "name": "78679cb2",
+            "multilineTextboxSpec": {
+              "lines": [
+                "<span style=\"font-size: 14px;\">Sales Dashboard</span>"
+              ]
+            }
+          },
+          "position": {
+            "x": 2,
+            "y": 0,
+            "width": 7,
+            "height": 1
+          }
+        },
+        {
+          "widget": {
+            "name": "2bc25327",
+            "queries": [
+              {
+                "name": "main_query",
+                "query": {
+                  "datasetName": "a5ed97a8",
+                  "fields": [
+                    {
+                      "name": "count(*)",
+                      "expression": "COUNT(`*`)"
+                    },
+                    {
+                      "name": "category",
+                      "expression": "`category`"
+                    }
+                  ],
+                  "disaggregated": false
+                }
+              }
+            ],
+            "spec": {
+              "version": 3,
+              "widgetType": "bar",
+              "encodings": {
+                "x": {
+                  "fieldName": "count(*)",
+                  "scale": {
+                    "type": "quantitative"
+                  }
+                },
+                "y": {
+                  "fieldName": "category",
+                  "scale": {
+                    "type": "categorical"
+                  }
+                }
+              },
+              "data": {
+                "queryName": "main_query"
+              }
+            }
+          },
+          "position": {
+            "x": 1,
+            "y": 1,
+            "width": 5,
+            "height": 6
+          }
+        },
+        {
+          "widget": {
+            "name": "08a1ab25",
+            "queries": [
+              {
+                "name": "main_query",
+                "query": {
+                  "datasetName": "f922c8b0",
+                  "fields": [
+                    {
+                      "name": "monthly(order_date)",
+                      "expression": "DATE_TRUNC(\"MONTH\", `order_date`)"
+                    },
+                    {
+                      "name": "sum(sales_amount)",
+                      "expression": "SUM(`sales_amount`)"
+                    }
+                  ],
+                  "disaggregated": false
+                }
+              }
+            ],
+            "spec": {
+              "version": 3,
+              "widgetType": "line",
+              "encodings": {
+                "x": {
+                  "fieldName": "monthly(order_date)",
+                  "scale": {
+                    "type": "temporal"
+                  }
+                },
+                "y": {
+                  "fieldName": "sum(sales_amount)",
+                  "scale": {
+                    "type": "quantitative"
+                  }
+                }
+              },
+              "data": {
+                "queryName": "main_query"
+              }
+            }
+          },
+          "position": {
+            "x": 6,
+            "y": 1,
+            "width": 4,
+            "height": 6
+          }
+        }
+      ],
+      "pageType": "PAGE_TYPE_CANVAS",
+      "layoutVersion": "GRID_V1"
+    }
+  ],
+  "uiSettings": {
+    "theme": {
+      "widgetHeaderAlignment": "ALIGNMENT_UNSPECIFIED"
+    },
+    "applyModeEnabled": false
+  }
+}
